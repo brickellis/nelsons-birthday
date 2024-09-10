@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Top 10 Words</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        p {
+            text-align: center;
+        }
+        #wordInput {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            width: 60%;
+            max-width: 300px;
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #guesses, #reveal {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #guessList, #answerList {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            display: inline-block;
+        }
+        li {
+            padding: 5px;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+        #lastIncorrectGuess {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Top 10 Words in President Nelson's Talks</h1>
+    <input type="text" id="wordInput" placeholder="Enter a word" onkeypress="return isLetter(event)">
+    <button onclick="makeGuess()">Guess</button>
+    <div id="guesses">
+        <h3>Your Guesses:</h3>
+        <ul id="guessList"></ul>
+        <p id="lastIncorrectGuess"></p>
+    </div>
+    <button id="revealButton" onclick="revealAnswers()">Reveal Answers</button>
+    <div id="reveal" class="hidden">
+        <h3>The Top 10 Words:</h3>
+        <ul id="answerList"></ul>
+    </div>
+    <script>
+        const topWords = [
+            { word: 'christ', frequency: 276 },
+            { word: 'god', frequency: 258 },
+            { word: 'jesus', frequency: 244 },
+            { word: 'lord', frequency: 241 },
+            { word: 'temple', frequency: 208 },
+            { word: 'church', frequency: 162 },
+            { word: 'faith', frequency: 127 },
+            { word: 'life', frequency: 124 },
+            { word: 'world', frequency: 124 },
+            { word: 'power', frequency: 116 }
+        ];
+    
+        const guessedWords = [];
+    
+        document.getElementById('wordInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                makeGuess();
+            }
+        });
+    
+        function isLetter(event) {
+            const charCode = event.keyCode || event.which;
+            const charStr = String.fromCharCode(charCode);
+            if (!/^[a-zA-Z]$/.test(charStr) && charCode !== 8 && charCode !== 13) { 
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+    
+        function capitalizeFirstLetter(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+    
+        function makeGuess() {
+            const input = document.getElementById('wordInput').value.trim().toLowerCase();
+            const guessList = document.getElementById('guessList');
+            const lastIncorrectGuess = document.getElementById('lastIncorrectGuess');
+    
+            if (!input || guessedWords.includes(input)) {
+                alert('Please enter a valid, non-repeated word.');
+                return;
+            }
+    
+            guessedWords.push(input);
+    
+            const capitalizedInput = capitalizeFirstLetter(input);
+    
+            if (topWords.some(item => item.word === input)) {
+                const correctWord = topWords.find(item => item.word === input);
+                const listItem = document.createElement('li');
+                listItem.textContent = `${capitalizedInput} (Correct! Frequency: ${correctWord.frequency})`;
+                listItem.style.color = 'green';
+                guessList.appendChild(listItem);
+                lastIncorrectGuess.textContent = ''; 
+            } else {
+                lastIncorrectGuess.textContent = `Last Incorrect Guess: ${capitalizedInput}`;
+                lastIncorrectGuess.style.color = 'red';
+            }
+    
+            document.getElementById('wordInput').value = '';
+        }
+    
+        function revealAnswers() {
+            document.getElementById('reveal').classList.remove('hidden');
+            const answerList = document.getElementById('answerList');
+            topWords.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${capitalizeFirstLetter(item.word)} (Frequency: ${item.frequency})`;
+                answerList.appendChild(listItem);
+            });
+            document.getElementById('revealButton').disabled = true;
+        }
+    </script>
+    
+</body>
+</html>
